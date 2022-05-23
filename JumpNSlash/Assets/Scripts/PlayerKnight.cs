@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerKnight : MonoBehaviour
 {
@@ -9,9 +11,10 @@ public class PlayerKnight : MonoBehaviour
     Rigidbody2D rb;
     public GameObject swordDamageArea;
     Animator anim;
-    
+    public Text scoreText;
+    public Text totalScore;
     bool isAlive;
-
+    public static event Action OnPlayerDeath;
     private int score;
 
     void Start()
@@ -35,6 +38,8 @@ public class PlayerKnight : MonoBehaviour
     }
     void Update()
     {
+        scoreText.text = score.ToString();
+        totalScore.text = score.ToString();
         if (Input.GetKeyDown("k"))
         {
             Jump();
@@ -75,6 +80,7 @@ public class PlayerKnight : MonoBehaviour
         {
             isAlive = false;
             anim.SetTrigger("death");
+            OnPlayerDeath?.Invoke();
         }
     }
     public void Jump()

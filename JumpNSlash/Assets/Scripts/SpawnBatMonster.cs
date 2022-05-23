@@ -16,7 +16,7 @@ public class SpawnBatMonster : MonoBehaviour
     {
         while (true)
         {
-            spawnTime = Random.Range(1, 3);
+            spawnTime = Random.Range(3, 5);
             yield return new WaitForSeconds(spawnTime);
             MakeObject();
         }
