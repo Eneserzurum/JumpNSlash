@@ -9,14 +9,30 @@ public class PlayerKnight : MonoBehaviour
     Rigidbody2D rb;
     public GameObject swordDamageArea;
     Animator anim;
+    
+    bool isAlive;
+
+    private int score;
 
     void Start()
     {
+        isAlive = true;
         anim = this.GetComponent<Animator>();
         rb = gameObject.GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
+    public void ScoreUp()
+    {
+        score++;
+    }
+    public int ShowScore()
+    {
+        return score;
+    }
+    public bool IsHeAlive()
+    {
+        return isAlive;
+    }
     void Update()
     {
         if (Input.GetKeyDown("k"))
@@ -33,6 +49,18 @@ public class PlayerKnight : MonoBehaviour
             Attack();
         }
     }
+    bool IsInGround()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position + new Vector3(0, -0.25f, 0), Vector2.down, 0.1f);
+        if (hit.collider)
+        {
+            return true;
+        }    
+        else
+        {
+            return false;
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("MushMan"))
@@ -41,25 +69,48 @@ public class PlayerKnight : MonoBehaviour
             Jump();
         }
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("MushMan") || collision.gameObject.CompareTag("BatMonster"))
+        {
+            isAlive = false;
+            anim.SetTrigger("death");
+        }
+    }
     public void Jump()
     {
-        rb.velocity = Vector2.zero;
-        rb.AddForce(Vector2.up * jumpStrength);
+        if (isAlive)
+        {
+            if (IsInGround())
+            {
+                rb.velocity = Vector2.zero;
+                rb.AddForce(Vector2.up * jumpStrength);
+            }
+        }
     }
     public void GetDown()
     {
-        rb.velocity = Vector2.zero;
-        rb.AddForce(Vector2.down * jumpStrength);
+        if (isAlive)
+        {
+            if (!IsInGround())
+            {
+                rb.velocity = Vector2.zero;
+                rb.AddForce(Vector2.down * jumpStrength);
+            }
+        }
     }
     public void Attack()
     {
-        anim.SetTrigger("attack");
-        StartCoroutine(SwordOffOn());
+        if (isAlive)
+        {
+            anim.SetTrigger("attack");
+            StartCoroutine(SwordOffOn());
+        }
     }
     IEnumerator SwordOffOn()
     {
         swordDamageArea.SetActive(true);
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.45f);
         swordDamageArea.SetActive(false);
     }
 

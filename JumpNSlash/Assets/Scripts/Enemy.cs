@@ -9,35 +9,58 @@ public class Enemy : MonoBehaviour
     bool isAlive;
     
     Animator anim;
-    
+    GameObject player;
+    SpriteRenderer sr;
     void Start()
     {
         anim = this.GetComponent<Animator>();
+        sr = this.GetComponent<SpriteRenderer>();
         isAlive = true;
+        player = GameObject.Find("PlayerKnight");
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         if (isAlive == true)
         {
-            GoForward();
-            //karakter ölüyse geri git;
+            if(player.GetComponent<PlayerKnight>().IsHeAlive() == true)
+            {
+                GoForward();
+            }
+            else
+            {
+                GoBackward();
+            }
         }
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Sword"))
+        {
+            Die();
+        }
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
     public void Die()
     {
         anim.SetTrigger("kill");
-        //karakterin skoru artsın
         isAlive = false;
-        Destroy(this.gameObject,0.3f);
+        Destroy(this.gameObject,0.4f);
+        player.GetComponent<PlayerKnight>().ScoreUp();
     }
     void GoForward()
     {
+        sr.flipX = true;
         transform.Translate(-movementSpeed * Time.deltaTime, 0, 0);
     }
     void GoBackward()
     {
+        sr.flipX = false;
         transform.Translate(movementSpeed * Time.deltaTime, 0, 0);
     }
 }
